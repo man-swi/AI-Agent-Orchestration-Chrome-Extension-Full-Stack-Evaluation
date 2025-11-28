@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 380px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    h2 {
+      color: white;
+      font-size: 22px;
+      margin-bottom: 18px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .search-box {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 16px;
+    }
+
+    #queryInput {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    #queryInput:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    #queryInput::placeholder {
+      color: #999;
+    }
+
+    #searchBtn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    #searchBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    #searchBtn:active {
+      transform: translateY(0);
+    }
+
+    #searchBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #resultContainer {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h3 {
+      color: #667eea;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 8px;
+    }
+
+    #matchText {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #f8f9ff;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .meta-badge.score {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .meta-badge.source {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    #traceDetails {
+      margin-top: 16px;
+      display: none;
+    }
+
+    details {
+      background: #f8f9ff;
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    summary {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 13px;
+      user-select: none;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    summary:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: #2d2d2d;
+      border-radius: 4px;
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    pre::-webkit-scrollbar-thumb:hover {
+      background: #666;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Agent Orchestrator</h2>
+
+    <div class="search-box">
+      <input 
+        id="queryInput" 
+        placeholder="Ask something about CentrAlign..."
+        autocomplete="off"
+      >
+      <button id="searchBtn">Ask Agent</button>
+    </div>
+
+    <div id="resultContainer">
+      <h3>Best Match</h3>
+      <div id="matchText"></div>
+      
+      <div class="meta-info">
+        <span class="meta-badge score" id="matchScore"></span>
+        <span class="meta-badge source" id="matchSource"></span>
+      </div>
+    </div>
+
+    <div id="traceDetails">
+      <details>
+        <summary>View Agent Trace & JSON</summary>
+        <pre id="jsonOutput"></pre>
+      </details>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

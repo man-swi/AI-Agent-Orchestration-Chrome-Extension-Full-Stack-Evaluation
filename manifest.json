@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Agent Orchestrator",
+  "version": "1.0",
+  "description": "AI Planner demo using semantic + keyword tools.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Agent Orchestrator"
+  },
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}
